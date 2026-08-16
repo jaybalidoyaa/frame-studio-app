@@ -23,6 +23,15 @@ export const WORKFLOW_LABELS: Record<WorkflowStep, string> = {
   export: 'Export',
 }
 
+export const WORKFLOW_DESCRIPTIONS: Record<WorkflowStep, string> = {
+  photos: 'Upload & manage',
+  details: 'Incident metadata',
+  template: 'Frame & branding',
+  edit: 'Adjust & enhance',
+  review: 'Check & confirm',
+  export: 'Download package',
+}
+
 export type EventType =
   | 'fire'
   | 'medical'

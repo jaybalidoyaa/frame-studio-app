@@ -1,6 +1,5 @@
-import { Menu, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
+import { useState } from 'react'
 import { useStudioStore } from '@/store/studioStore'
-import { WORKFLOW_LABELS, WORKFLOW_STEPS } from '@/domain/types'
 import type { WorkflowStep } from '@/domain/types'
 import { PhotosPanel } from '@/features/photos/PhotosPanel'
 import { DetailsPanel } from '@/features/details/DetailsPanel'
@@ -9,124 +8,136 @@ import { EditPanel } from '@/features/edit/EditPanel'
 import { ReviewPanel } from '@/features/review/ReviewPanel'
 import { ExportPanel } from '@/features/export/ExportPanel'
 import { PreviewCanvas } from '@/ui/PreviewCanvas'
-import { DraftHeader } from '@/ui/DraftHeader'
+import { IncidentSidebar } from '@/ui/IncidentSidebar'
+import { TopBar } from '@/ui/TopBar'
 import { ToastStack } from '@/ui/ToastStack'
 import { ExportBar } from '@/ui/ExportBar'
-import { Button } from '@/components/ui/button'
+import { PhotoFilmstrip } from '@/ui/PhotoFilmstrip'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { cn } from '@/lib/utils'
 
-function StepContent({ step }: { step: WorkflowStep }) {
+function FormPanel({ step }: { step: WorkflowStep }) {
   switch (step) {
-    case 'photos':
-      return <PhotosPanel />
     case 'details':
       return <DetailsPanel />
-    case 'template':
-      return <TemplatePanel />
-    case 'edit':
-      return <EditPanel />
     case 'review':
       return <ReviewPanel />
     case 'export':
       return <ExportPanel />
+    default:
+      return null
   }
 }
 
 export function AppShell() {
   const step = useStudioStore((s) => s.step)
-  const setStep = useStudioStore((s) => s.setStep)
-  const inspectorOpen = useStudioStore((s) => s.inspectorOpen)
-  const setInspectorOpen = useStudioStore((s) => s.setInspectorOpen)
-  const stepIndex = WORKFLOW_STEPS.indexOf(step)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const isCanvasStep =
+    step === 'photos' || step === 'template' || step === 'edit'
 
   return (
     <div className="app-shell">
-      <DraftHeader />
+      <IncidentSidebar
+        open={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
 
-      <div className="border-b border-border/80 bg-card/60 backdrop-blur-sm">
-        <div className="flex items-center gap-2 px-3 py-2 sm:px-4">
-          <nav
-            className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto pb-0.5"
-            aria-label="Workflow"
-          >
-            {WORKFLOW_STEPS.map((s, i) => {
-              const active = step === s
-              const done = i < stepIndex
-              return (
-                <button
-                  key={s}
-                  type="button"
-                  onClick={() => setStep(s)}
-                  aria-current={active ? 'step' : undefined}
-                  className={cn(
-                    'inline-flex shrink-0 items-center gap-2 rounded-lg px-2.5 py-2 text-sm font-medium transition-colors',
-                    active && 'bg-primary text-primary-foreground shadow-sm',
-                    !active &&
-                      done &&
-                      'text-foreground hover:bg-muted',
-                    !active &&
-                      !done &&
-                      'text-muted-foreground hover:bg-muted hover:text-foreground',
-                  )}
-                >
-                  <span
-                    className={cn(
-                      'inline-flex size-5 items-center justify-center rounded-full text-[11px] font-bold',
-                      active
-                        ? 'bg-primary-foreground/20 text-primary-foreground'
-                        : done
-                          ? 'bg-primary/20 text-primary'
-                          : 'bg-muted text-muted-foreground',
+      {sidebarOpen && (
+        <button
+          type="button"
+          className="fixed inset-0 z-30 bg-black/50 lg:hidden"
+          aria-label="Close sidebar overlay"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      <div className="flex min-h-0 min-w-0 flex-col">
+        <TopBar onToggleSidebar={() => setSidebarOpen((v) => !v)} />
+
+        <div className="min-h-0 flex-1">
+          {isCanvasStep ? (
+            <div className="workspace-main h-full">
+              <aside
+                className={cn(
+                  'workspace-library min-h-0 border-r border-border bg-card',
+                  (step === 'photos' || step === 'edit') && 'max-md:open',
+                )}
+                aria-label="Photo library"
+              >
+                <ScrollArea className="h-full">
+                  <div className="p-3">
+                    {step === 'template' ? (
+                      <TemplatePanel />
+                    ) : (
+                      <PhotosPanel compact={step === 'edit'} />
                     )}
-                  >
-                    {i + 1}
-                  </span>
-                  <span className="hidden sm:inline">{WORKFLOW_LABELS[s]}</span>
-                </button>
-              )
-            })}
-          </nav>
+                  </div>
+                </ScrollArea>
+              </aside>
 
-          <Button
-            variant="outline"
-            size="sm"
-            className="shrink-0 md:hidden"
-            onClick={() => setInspectorOpen(!inspectorOpen)}
-          >
-            {inspectorOpen ? <PanelLeftClose /> : <PanelLeftOpen />}
-            <span className="hidden xs:inline">
-              {inspectorOpen ? 'Hide' : 'Tools'}
-            </span>
-            <Menu className="xs:hidden" />
-          </Button>
-        </div>
-      </div>
+              <section
+                className="flex min-h-0 min-w-0 flex-col bg-[var(--preview)]"
+                aria-label="Editor canvas"
+              >
+                <div className="min-h-0 flex-1 overflow-auto p-3 sm:p-4">
+                  <PreviewCanvas />
+                </div>
+                <PhotoFilmstrip />
+              </section>
 
-      <div className="workspace">
-        <aside
-          className={cn(
-            'min-h-0 border-r border-border/80 bg-sidebar text-sidebar-foreground',
-            !inspectorOpen && 'max-md:hidden',
-          )}
-          aria-label="Inspector"
-        >
-          <ScrollArea className="h-full">
-            <div className="p-4">
-              <StepContent step={step} />
+              <aside
+                className={cn(
+                  'workspace-inspector min-h-0 border-l border-border bg-card',
+                  step === 'edit' && 'open',
+                )}
+                aria-label="Inspector"
+              >
+                <ScrollArea className="h-full">
+                  <div className="p-3">
+                    {step === 'edit' ? (
+                      <EditPanel />
+                    ) : step === 'template' ? (
+                      <div className="space-y-3 text-sm text-muted-foreground">
+                        <p className="text-xs font-semibold tracking-wider text-foreground uppercase">
+                          Template
+                        </p>
+                        <p>
+                          Select a frame from the library. Active template
+                          updates the live 940×788 preview.
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="space-y-3 text-sm text-muted-foreground">
+                        <p className="text-xs font-semibold tracking-wider text-foreground uppercase">
+                          Photo tips
+                        </p>
+                        <ul className="list-inside list-disc space-y-1.5 text-xs">
+                          <li>Mark one cover image for package priority</li>
+                          <li>Use batch privacy before public export</li>
+                          <li>Amber warnings mean review before export</li>
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                </ScrollArea>
+              </aside>
             </div>
-          </ScrollArea>
-        </aside>
+          ) : (
+            <div className="grid h-full min-h-0 lg:grid-cols-[minmax(0,1fr)_minmax(300px,380px)]">
+              <section className="min-h-0 overflow-auto border-r border-border bg-[var(--preview)] p-3 sm:p-4">
+                <PreviewCanvas />
+                <PhotoFilmstrip />
+              </section>
+              <aside className="min-h-0 overflow-auto bg-card p-4">
+                <FormPanel step={step} />
+              </aside>
+            </div>
+          )}
+        </div>
 
-        <section
-          className="preview-pane min-h-0 overflow-auto bg-[var(--preview)] p-3 sm:p-4"
-          aria-label="Preview"
-        >
-          <PreviewCanvas />
-        </section>
+        <ExportBar />
       </div>
 
-      <ExportBar />
       <ToastStack />
     </div>
   )

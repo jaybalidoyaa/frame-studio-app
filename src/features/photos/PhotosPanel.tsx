@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/select'
 import { cn } from '@/lib/utils'
 
-export function PhotosPanel() {
+export function PhotosPanel({ compact = false }: { compact?: boolean }) {
   const draft = useStudioStore((s) => s.draft)
   const addFiles = useStudioStore((s) => s.addFiles)
   const removePhoto = useStudioStore((s) => s.removePhoto)
@@ -58,14 +58,19 @@ export function PhotosPanel() {
   )
 
   return (
-    <div className="space-y-5" onPaste={onPaste}>
+    <div className="space-y-4" onPaste={onPaste}>
       <div className="space-y-1">
-        <h2 className="text-base font-semibold tracking-tight">Photos</h2>
-        <p className="text-sm text-muted-foreground">
-          Drop, paste, or browse. JPEG, PNG, WebP, HEIC when supported.
-        </p>
+        <h2 className="text-sm font-semibold tracking-wide uppercase">
+          Photos ({draft.photos.length})
+        </h2>
+        {!compact && (
+          <p className="text-sm text-muted-foreground">
+            Drop, paste, or browse. JPEG, PNG, WebP, HEIC when supported.
+          </p>
+        )}
       </div>
 
+      {!compact && (
       <div
         className={cn('dropzone', dragOver && 'active')}
         role="button"
@@ -99,6 +104,29 @@ export function PhotosPanel() {
           onChange={(e) => onFiles(e.target.files)}
         />
       </div>
+      )}
+
+      {compact && (
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex-1 rounded-sm"
+            onClick={() => fileRef.current?.click()}
+          >
+            <ImagePlus data-icon="inline-start" />
+            Upload
+          </Button>
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/*"
+            multiple
+            className="sr-only"
+            onChange={(e) => onFiles(e.target.files)}
+          />
+        </div>
+      )}
 
       {draft.photos.length === 0 ? (
         <div className="rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">
@@ -242,10 +270,12 @@ export function PhotosPanel() {
         </>
       )}
 
-      <Button className="w-full" onClick={() => setStep('details')}>
+      {!compact && (
+      <Button className="w-full rounded-sm" onClick={() => setStep('details')}>
         Continue to details
         <ArrowRight data-icon="inline-end" />
       </Button>
+      )}
     </div>
   )
 }
