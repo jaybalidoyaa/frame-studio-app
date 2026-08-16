@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
 import { useStudioStore } from '../store/studioStore'
+import { useActivePhoto } from '../store/hooks'
 import { getTemplateById } from '../domain/templates'
 import { composeToCanvas, loadImage } from '../pipeline/compose'
 
 export function PreviewCanvas() {
   const draft = useStudioStore((s) => s.draft)
   const customTemplates = useStudioStore((s) => s.customTemplates)
-  const activePhoto = useStudioStore((s) => s.activePhoto())
+  const activePhoto = useActivePhoto()
   const updatePhotoAdjust = useStudioStore((s) => s.updatePhotoAdjust)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const dragRef = useRef<{ x: number; y: number; panX: number; panY: number } | null>(

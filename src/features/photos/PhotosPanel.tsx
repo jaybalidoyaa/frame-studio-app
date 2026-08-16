@@ -1,5 +1,6 @@
 import { useCallback, useRef, useState } from 'react'
 import { useStudioStore } from '../../store/studioStore'
+import { useTemplates } from '../../store/hooks'
 import { formatBytes } from '../../pipeline/ingest'
 
 export function PhotosPanel() {
@@ -17,7 +18,7 @@ export function PhotosPanel() {
   const batchSetPrivacy = useStudioStore((s) => s.batchSetPrivacy)
   const batchSetTemplateOverride = useStudioStore((s) => s.batchSetTemplateOverride)
   const replacePhoto = useStudioStore((s) => s.replacePhoto)
-  const templates = useStudioStore((s) => s.templates())
+  const templates = useTemplates()
   const setStep = useStudioStore((s) => s.setStep)
   const fileRef = useRef<HTMLInputElement>(null)
   const replaceRef = useRef<HTMLInputElement>(null)

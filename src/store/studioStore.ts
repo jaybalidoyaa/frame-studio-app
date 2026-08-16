@@ -148,31 +148,48 @@ export const useStudioStore = create<StudioState>((set, get) => ({
   exportProgress: null,
 
   init: async () => {
-    const [drafts, customTemplates, settings, callsigns, locations] =
-      await Promise.all([
-        listDrafts(),
-        listCustomTemplates(),
-        loadSettings(),
-        getRecents('callsigns'),
-        getRecents('locations'),
-      ])
-    document.documentElement.setAttribute('data-theme', settings.theme)
-    let draft = drafts.find((d) => !d.archived) ?? createEmptyDraft()
-    if (!drafts.length) {
-      await saveDraft(draft)
+    try {
+      const [drafts, customTemplates, settings, callsigns, locations] =
+        await Promise.all([
+          listDrafts(),
+          listCustomTemplates(),
+          loadSettings(),
+          getRecents('callsigns'),
+          getRecents('locations'),
+        ])
+      document.documentElement.setAttribute('data-theme', settings.theme)
+      let draft = drafts.find((d) => !d.archived) ?? createEmptyDraft()
+      if (!drafts.length) {
+        await saveDraft(draft)
+      }
+      set({
+        ready: true,
+        drafts,
+        customTemplates,
+        settings,
+        draft,
+        activePhotoId: draft.photos[0]?.id ?? null,
+        recents: {
+          callsigns: callsigns.map((c) => c.value),
+          locations: locations.map((l) => l.value),
+        },
+      })
+    } catch (err) {
+      console.error('Frame Studio init failed', err)
+      const draft = createEmptyDraft()
+      set({
+        ready: true,
+        draft,
+        drafts: [],
+        customTemplates: [],
+        activePhotoId: null,
+        saveState: 'error',
+      })
+      get().toast(
+        'Local storage unavailable — working in memory only',
+        'warn',
+      )
     }
-    set({
-      ready: true,
-      drafts,
-      customTemplates,
-      settings,
-      draft,
-      activePhotoId: draft.photos[0]?.id ?? null,
-      recents: {
-        callsigns: callsigns.map((c) => c.value),
-        locations: locations.map((l) => l.value),
-      },
-    })
   },
 
   toast: (message, tone = 'info') => {

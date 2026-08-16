@@ -1,11 +1,12 @@
 import { useStudioStore } from '../../store/studioStore'
+import { useReadyToExport } from '../../store/hooks'
 import { getTemplateById } from '../../domain/templates'
 import { validateMetadata } from '../../domain/validation'
 
 export function ReviewPanel() {
   const draft = useStudioStore((s) => s.draft)
   const customTemplates = useStudioStore((s) => s.customTemplates)
-  const isReady = useStudioStore((s) => s.isReadyToExport())
+  const isReady = useReadyToExport()
   const setStep = useStudioStore((s) => s.setStep)
   const setPhotoPrivacy = useStudioStore((s) => s.setPhotoPrivacy)
   const setActivePhoto = useStudioStore((s) => s.setActivePhoto)

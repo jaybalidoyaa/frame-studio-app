@@ -1,8 +1,9 @@
 import { useStudioStore } from '../store/studioStore'
+import { useReadyToExport } from '../store/hooks'
 
 export function ExportBar() {
   const setStep = useStudioStore((s) => s.setStep)
-  const isReady = useStudioStore((s) => s.isReadyToExport())
+  const isReady = useReadyToExport()
   const progress = useStudioStore((s) => s.exportProgress)
   const photoCount = useStudioStore((s) => s.draft.photos.length)
 

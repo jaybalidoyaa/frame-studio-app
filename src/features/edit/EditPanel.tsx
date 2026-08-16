@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import { useStudioStore, DEFAULT_ADJUST } from '../../store/studioStore'
+import { useActivePhoto } from '../../store/hooks'
 import type { RedactionKind } from '../../domain/types'
 import { providers } from '../../providers'
 
 export function EditPanel() {
-  const photo = useStudioStore((s) => s.activePhoto())
+  const photo = useActivePhoto()
   const updatePhotoAdjust = useStudioStore((s) => s.updatePhotoAdjust)
   const applyAdjustToAll = useStudioStore((s) => s.applyAdjustToAll)
   const addRedaction = useStudioStore((s) => s.addRedaction)

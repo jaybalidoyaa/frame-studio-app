@@ -1,4 +1,5 @@
 import { useStudioStore } from '../../store/studioStore'
+import { useValidationIssues } from '../../store/hooks'
 import { metadataSummary } from '../../domain/validation'
 import type { EventType, Severity } from '../../domain/types'
 import { providers } from '../../providers'
@@ -22,7 +23,7 @@ export function DetailsPanel() {
   const recents = useStudioStore((s) => s.recents)
   const updateMetadata = useStudioStore((s) => s.updateMetadata)
   const copyMetadataFromDraft = useStudioStore((s) => s.copyMetadataFromDraft)
-  const issues = useStudioStore((s) => s.validationIssues())
+  const issues = useValidationIssues()
   const setStep = useStudioStore((s) => s.setStep)
   const meta = draft.metadata
   const [mapQuery, setMapQuery] = useState('')

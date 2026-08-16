@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useStudioStore } from '../../store/studioStore'
+import { useTemplates } from '../../store/hooks'
 import type { FrameTemplate } from '../../domain/types'
 import { validateTemplateConfig } from '../../domain/templates'
 
@@ -16,7 +17,7 @@ const CATEGORY_LABEL: Record<string, string> = {
 
 export function TemplatePanel() {
   const draft = useStudioStore((s) => s.draft)
-  const templates = useStudioStore((s) => s.templates())
+  const templates = useTemplates()
   const setTemplateId = useStudioStore((s) => s.setTemplateId)
   const saveTemplateLocal = useStudioStore((s) => s.saveTemplateLocal)
   const powerUser = useStudioStore((s) => s.settings.powerUser)

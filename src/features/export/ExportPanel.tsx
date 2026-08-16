@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useStudioStore } from '../../store/studioStore'
+import { useActivePhoto, useReadyToExport, useTemplates } from '../../store/hooks'
 import {
   downloadBlob,
   exportAllZip,
@@ -14,8 +15,9 @@ import { buildFilenameParts, generateFilename } from '../../domain/filename'
 export function ExportPanel() {
   const draft = useStudioStore((s) => s.draft)
   const customTemplates = useStudioStore((s) => s.customTemplates)
-  const activePhoto = useStudioStore((s) => s.activePhoto())
-  const isReady = useStudioStore((s) => s.isReadyToExport())
+  const activePhoto = useActivePhoto()
+  const isReady = useReadyToExport()
+  const templates = useTemplates()
   const setFilenamePattern = useStudioStore((s) => s.setFilenamePattern)
   const setRetainExif = useStudioStore((s) => s.setRetainExif)
   const setExportStatus = useStudioStore((s) => s.setExportStatus)
@@ -23,8 +25,6 @@ export function ExportPanel() {
   const clearSensitive = useStudioStore((s) => s.clearSensitive)
   const toast = useStudioStore((s) => s.toast)
   const [busy, setBusy] = useState(false)
-
-  const templates = [...useStudioStore.getState().templates()]
 
   const withLogo = async () => {
     try {
