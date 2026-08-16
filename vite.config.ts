@@ -9,16 +9,27 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'branding/emblem.svg'],
+      includeAssets: [
+        'favicon.svg',
+        'branding/emblem.svg',
+        'branding/brigada-onse-logo.png',
+      ],
       manifest: {
-        name: 'Frame Studio',
-        short_name: 'Frame Studio',
-        description: 'Emergency-response documentation Frame Studio',
+        name: 'Brigada Onse SVFAR Studio',
+        short_name: 'SVFAR Studio',
+        description:
+          'Brigada Onse Sun Valley Fire & Rescue Frame Studio for incident documentation',
         theme_color: '#0b1220',
         background_color: '#0b1220',
         display: 'standalone',
         start_url: '/',
         icons: [
+          {
+            src: 'branding/brigada-onse-logo.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'any',
+          },
           {
             src: 'favicon.svg',
             sizes: 'any',

@@ -47,7 +47,7 @@ export function PreviewCanvas() {
         )
         let logo: HTMLImageElement | null = null
         try {
-          logo = await loadImage('/branding/emblem.svg')
+          logo = await loadImage('/branding/brigada-onse-logo.png')
         } catch {
           logo = null
         }

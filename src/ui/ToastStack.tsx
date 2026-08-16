@@ -1,4 +1,6 @@
+import { XClose } from '@untitledui/icons'
 import { useStudioStore } from '../store/studioStore'
+import { Button } from '../components/base/buttons/button'
 
 export function ToastStack() {
   const toasts = useStudioStore((s) => s.toasts)
@@ -10,15 +12,15 @@ export function ToastStack() {
         <div key={t.id} className={`toast ${t.tone ?? 'info'}`} role="status">
           <div className="flex items-start justify-between gap-3">
             <span>{t.message}</span>
-            <button
-              type="button"
-              className="btn btn-ghost"
-              style={{ padding: '0 0.25rem' }}
-              onClick={() => dismissToast(t.id)}
+            <Button
+              color="tertiary"
+              size="sm"
               aria-label="Dismiss"
+              className="!p-1"
+              onPress={() => dismissToast(t.id)}
             >
-              ×
-            </button>
+              <XClose data-icon className="size-4" />
+            </Button>
           </div>
         </div>
       ))}

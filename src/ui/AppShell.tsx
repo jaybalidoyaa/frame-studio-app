@@ -1,3 +1,4 @@
+import { Menu01, XClose } from '@untitledui/icons'
 import { useStudioStore } from '../store/studioStore'
 import { WORKFLOW_LABELS, WORKFLOW_STEPS } from '../domain/types'
 import type { WorkflowStep } from '../domain/types'
@@ -11,6 +12,7 @@ import { PreviewCanvas } from './PreviewCanvas'
 import { DraftHeader } from './DraftHeader'
 import { ToastStack } from './ToastStack'
 import { ExportBar } from './ExportBar'
+import { Button } from '../components/base/buttons/button'
 
 function StepContent({ step }: { step: WorkflowStep }) {
   switch (step) {
@@ -38,6 +40,7 @@ export function AppShell() {
   return (
     <div className="app-shell">
       <DraftHeader />
+
       <nav className="stepper" aria-label="Workflow">
         {WORKFLOW_STEPS.map((s, i) => (
           <button
@@ -47,27 +50,36 @@ export function AppShell() {
             aria-current={step === s ? 'step' : undefined}
             onClick={() => setStep(s)}
           >
-            <span style={{ opacity: 0.55, marginRight: 6 }}>{i + 1}</span>
+            <span className="mr-1.5 inline-flex size-5 items-center justify-center rounded-full bg-black/15 text-[11px] font-bold">
+              {i + 1}
+            </span>
             {WORKFLOW_LABELS[s]}
           </button>
         ))}
-        <button
-          type="button"
-          className="btn btn-ghost ml-auto md:hidden"
-          onClick={() => setInspectorOpen(!inspectorOpen)}
-        >
-          {inspectorOpen ? 'Hide panel' : 'Show panel'}
-        </button>
+        <div className="ml-auto flex items-center gap-2 md:hidden">
+          <Button
+            color="secondary"
+            size="sm"
+            onPress={() => setInspectorOpen(!inspectorOpen)}
+          >
+            {inspectorOpen ? (
+              <XClose data-icon className="size-4" />
+            ) : (
+              <Menu01 data-icon className="size-4" />
+            )}
+            {inspectorOpen ? 'Hide' : 'Panel'}
+          </Button>
+        </div>
       </nav>
 
       <div className="workspace">
         <aside
-          className={`panel inspector-pane p-4 ${inspectorOpen ? 'open' : ''}`}
+          className={`panel inspector-pane p-3 sm:p-4 ${inspectorOpen ? 'open' : 'max-md:hidden'}`}
           aria-label="Inspector"
         >
           <StepContent step={step} />
         </aside>
-        <section className="preview-pane p-4" aria-label="Preview">
+        <section className="preview-pane p-3 sm:p-4" aria-label="Preview">
           <PreviewCanvas />
         </section>
       </div>

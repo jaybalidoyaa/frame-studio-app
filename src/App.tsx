@@ -17,8 +17,8 @@ export default function App() {
           <div className="skeleton h-6 w-40" />
           <div className="skeleton h-24 w-full" />
           <div className="skeleton h-4 w-3/4" />
-          <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
-            Loading Frame Studio…
+          <p className="text-sm text-fg-tertiary">
+            Loading Brigada Onse SVFAR Studio…
           </p>
         </div>
       </div>

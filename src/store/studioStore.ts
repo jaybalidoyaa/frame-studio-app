@@ -175,7 +175,7 @@ export const useStudioStore = create<StudioState>((set, get) => ({
         },
       })
     } catch (err) {
-      console.error('Frame Studio init failed', err)
+      console.error('SVFAR Studio init failed', err)
       const draft = createEmptyDraft()
       set({
         ready: true,

@@ -1,8 +1,8 @@
-# Frame Studio
+# Brigada Onse SVFAR Studio
 
-Production-oriented, **local-first** incident documentation studio. Responders upload photos, attach operational metadata, apply branded templates, redact sensitive content, review, and export a consistent **940 × 788** package.
+Production-oriented, **local-first** incident documentation studio for **Brigada Onse — Sun Valley Fire & Rescue**. Responders upload photos, attach operational metadata, apply branded templates, redact sensitive content, review, and export a consistent **940 × 788** package.
 
-The live Brigada Onse Camera `/studio` workflow (upload → metadata → frame → export) is inspiration only. This app is **Frame Studio only**—no camera booth, gallery, accounts, or social features.
+UI is built with [Untitled UI React](https://www.untitledui.com/react) patterns (Tailwind CSS v4 + React Aria Components + `@untitledui/icons`).
 
 ## Quick start
 

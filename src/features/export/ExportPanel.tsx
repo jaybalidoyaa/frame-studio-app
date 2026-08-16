@@ -28,7 +28,7 @@ export function ExportPanel() {
 
   const withLogo = async () => {
     try {
-      return await loadImage('/branding/emblem.svg')
+      return await loadImage('/branding/brigada-onse-logo.png')
     } catch {
       return null
     }
