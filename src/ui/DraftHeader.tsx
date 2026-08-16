@@ -1,19 +1,40 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import {
   Archive,
-  Copy01,
-  Moon01,
+  Copy,
+  Moon,
+  MoreHorizontal,
   Plus,
+  Settings2,
   Sun,
-  Trash01,
-  Rows01,
-} from '@untitledui/icons'
-import { useStudioStore } from '../store/studioStore'
-import { metadataSummary } from '../domain/validation'
-import { eventLabel } from '../domain/templates'
-import { Button } from '../components/base/buttons/button'
-import { Badge } from '../components/base/badges/badge'
-import { Input, NativeSelect } from '../components/base/input/input'
+  Trash2,
+} from 'lucide-react'
+import { useStudioStore } from '@/store/studioStore'
+import { metadataSummary } from '@/domain/validation'
+import { eventLabel } from '@/domain/templates'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Separator } from '@/components/ui/separator'
+import { Switch } from '@/components/ui/switch'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 function savedLabel(saveState: string, lastSavedAt: number | null): string {
   if (saveState === 'saving') return 'Saving…'
@@ -39,7 +60,9 @@ export function DraftHeader() {
   const deleteCurrent = useStudioStore((s) => s.deleteCurrent)
   const setTheme = useStudioStore((s) => s.setTheme)
   const setPowerUser = useStudioStore((s) => s.setPowerUser)
-  const [menuOpen, setMenuOpen] = useState(false)
+
+  const activeDrafts = drafts.filter((d) => !d.archived)
+  const archivedDrafts = drafts.filter((d) => d.archived)
 
   const summary = useMemo(
     () =>
@@ -48,48 +71,49 @@ export function DraftHeader() {
   )
 
   return (
-    <header className="border-b border-border-secondary bg-bg-elevated/90 px-3 py-3 backdrop-blur-md sm:px-4">
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
-        <div className="flex min-w-0 flex-1 items-start gap-3">
+    <header className="border-b border-border/80 bg-card/80 backdrop-blur-md">
+      <div className="flex flex-col gap-3 px-4 py-3 lg:flex-row lg:items-center lg:gap-4">
+        <div className="flex min-w-0 flex-1 items-center gap-3">
           <img
             src="/branding/brigada-onse-logo.png"
             alt="Brigada Onse"
-            width={52}
-            height={52}
-            className="mt-0.5 h-11 w-11 shrink-0 object-contain sm:h-12 sm:w-12"
+            width={48}
+            height={48}
+            className="size-11 shrink-0 object-contain sm:size-12"
           />
-          <div className="min-w-0 flex-1">
+          <div className="min-w-0 flex-1 space-y-1.5">
             <div className="flex flex-wrap items-center gap-2">
               <div className="min-w-0">
-                <p className="text-[11px] font-semibold tracking-[0.14em] text-brand-500 uppercase">
+                <p className="text-[10px] font-semibold tracking-[0.16em] text-primary uppercase">
                   Sun Valley Fire &amp; Rescue
                 </p>
-                <h1 className="truncate text-base font-semibold text-fg-primary sm:text-lg">
+                <h1 className="truncate text-base font-semibold tracking-tight sm:text-lg">
                   Brigada Onse SVFAR Studio
                 </h1>
               </div>
-              <Badge color="gold">{draft.shortId}</Badge>
+              <Badge variant="secondary" className="font-mono text-[10px]">
+                {draft.shortId}
+              </Badge>
               <Badge
-                color={
+                variant={
                   saveState === 'error'
-                    ? 'error'
+                    ? 'destructive'
                     : saveState === 'saving'
-                      ? 'warning'
-                      : 'success'
+                      ? 'outline'
+                      : 'secondary'
                 }
               >
                 <span aria-live="polite">{savedLabel(saveState, lastSavedAt)}</span>
               </Badge>
             </div>
-
             <Input
               aria-label="Incident name"
-              className="mt-2 max-w-xl"
               value={draft.name}
               onChange={(e) => renameDraft(e.target.value)}
+              className="h-9 max-w-xl bg-background"
             />
             <p
-              className="mt-1 truncate text-xs text-fg-tertiary"
+              className="truncate text-xs text-muted-foreground"
               title={metadataSummary(draft.metadata)}
             >
               {summary}
@@ -97,104 +121,118 @@ export function DraftHeader() {
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2 lg:justify-end">
-          <NativeSelect
-            aria-label="Resume draft"
-            className="min-w-[10rem] max-w-full sm:min-w-[12rem]"
-            value={draft.id}
-            onChange={(e) => void loadDraft(e.target.value)}
-          >
-            {drafts
-              .filter((d) => !d.archived)
-              .map((d) => (
-                <option key={d.id} value={d.id}>
-                  {d.name}
-                </option>
-              ))}
-            {drafts.some((d) => d.archived) && (
-              <optgroup label="Archived">
-                {drafts
-                  .filter((d) => d.archived)
-                  .map((d) => (
-                    <option key={d.id} value={d.id}>
-                      {d.name}
-                    </option>
-                  ))}
-              </optgroup>
-            )}
-          </NativeSelect>
+        <Separator className="lg:hidden" />
 
-          <Button
-            color="primary"
-            size="sm"
-            onPress={() => void newDraft()}
-          >
-            <Plus data-icon className="size-4" />
+        <div className="flex flex-wrap items-center gap-2 lg:justify-end">
+          <div className="min-w-[10rem] flex-1 sm:flex-none sm:min-w-[14rem]">
+            <Label htmlFor="draft-select" className="sr-only">
+              Resume draft
+            </Label>
+            <Select value={draft.id} onValueChange={(v) => void loadDraft(v)}>
+              <SelectTrigger id="draft-select" className="w-full bg-background">
+                <SelectValue placeholder="Select draft" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Active drafts</SelectLabel>
+                  {activeDrafts.map((d) => (
+                    <SelectItem key={d.id} value={d.id}>
+                      {d.name}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+                {archivedDrafts.length > 0 && (
+                  <SelectGroup>
+                    <SelectLabel>Archived</SelectLabel>
+                    {archivedDrafts.map((d) => (
+                      <SelectItem key={d.id} value={d.id}>
+                        {d.name}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                )}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <Button onClick={() => void newDraft()}>
+            <Plus data-icon="inline-start" />
             New
           </Button>
 
-          <Button
-            color="secondary"
-            size="sm"
-            className="lg:hidden"
-            onPress={() => setMenuOpen((v) => !v)}
-          >
-            <Rows01 data-icon className="size-4" />
-            More
-          </Button>
-
-          <div
-            className={`${menuOpen ? 'flex' : 'hidden'} w-full flex-wrap gap-2 lg:flex lg:w-auto`}
-          >
-            <Button
-              color="secondary"
-              size="sm"
-              onPress={() => void duplicateCurrent()}
-            >
-              <Copy01 data-icon className="size-4" />
+          <div className="hidden items-center gap-2 md:flex">
+            <Button variant="outline" onClick={() => void duplicateCurrent()}>
+              <Copy data-icon="inline-start" />
               Duplicate
             </Button>
-            <Button
-              color="secondary"
-              size="sm"
-              onPress={() => void archiveCurrent()}
-            >
-              <Archive data-icon className="size-4" />
+            <Button variant="outline" onClick={() => void archiveCurrent()}>
+              <Archive data-icon="inline-start" />
               Archive
             </Button>
             <Button
-              color="secondary-destructive"
-              size="sm"
-              onPress={() => {
+              variant="destructive"
+              onClick={() => {
                 if (confirm('Delete this draft permanently?')) void deleteCurrent()
               }}
             >
-              <Trash01 data-icon className="size-4" />
+              <Trash2 data-icon="inline-start" />
               Delete
             </Button>
-            <Button
-              color="tertiary"
-              size="sm"
-              onPress={() =>
-                setTheme(settings.theme === 'dark' ? 'light' : 'dark')
-              }
-            >
-              {settings.theme === 'dark' ? (
-                <Sun data-icon className="size-4" />
-              ) : (
-                <Moon01 data-icon className="size-4" />
-              )}
-              {settings.theme === 'dark' ? 'Light' : 'Dark'}
-            </Button>
-            <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-2 text-sm text-fg-tertiary ring-1 ring-inset ring-border-primary">
-              <input
-                type="checkbox"
-                checked={settings.powerUser}
-                onChange={(e) => setPowerUser(e.target.checked)}
-              />
-              Power user
-            </label>
           </div>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="icon" aria-label="More actions">
+                <MoreHorizontal />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-52">
+              <DropdownMenuLabel>Draft actions</DropdownMenuLabel>
+              <DropdownMenuItem
+                className="md:hidden"
+                onClick={() => void duplicateCurrent()}
+              >
+                <Copy /> Duplicate
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="md:hidden"
+                onClick={() => void archiveCurrent()}
+              >
+                <Archive /> Archive
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="text-destructive md:hidden"
+                onClick={() => {
+                  if (confirm('Delete this draft permanently?')) void deleteCurrent()
+                }}
+              >
+                <Trash2 /> Delete
+              </DropdownMenuItem>
+              <DropdownMenuSeparator className="md:hidden" />
+              <DropdownMenuLabel className="flex items-center gap-2 font-normal">
+                <Settings2 className="size-3.5" /> Preferences
+              </DropdownMenuLabel>
+              <DropdownMenuItem
+                onClick={() =>
+                  setTheme(settings.theme === 'dark' ? 'light' : 'dark')
+                }
+              >
+                {settings.theme === 'dark' ? <Sun /> : <Moon />}
+                {settings.theme === 'dark' ? 'Light theme' : 'Dark theme'}
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <div className="flex items-center justify-between gap-3 px-2 py-1.5">
+                <Label htmlFor="power-user" className="text-sm font-normal">
+                  Power user
+                </Label>
+                <Switch
+                  id="power-user"
+                  checked={settings.powerUser}
+                  onCheckedChange={setPowerUser}
+                />
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </header>

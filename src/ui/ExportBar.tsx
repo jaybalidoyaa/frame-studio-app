@@ -1,58 +1,58 @@
-import { CheckCircle, AlertCircle, Package } from '@untitledui/icons'
-import { useStudioStore } from '../store/studioStore'
-import { useReadyToExport } from '../store/hooks'
-import { Button } from '../components/base/buttons/button'
-import { Badge } from '../components/base/badges/badge'
+import { AlertCircle, CheckCircle2, Package } from 'lucide-react'
+import { useStudioStore } from '@/store/studioStore'
+import { useReadyToExport } from '@/store/hooks'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Progress } from '@/components/ui/progress'
 
 export function ExportBar() {
   const setStep = useStudioStore((s) => s.setStep)
   const isReady = useReadyToExport()
   const progress = useStudioStore((s) => s.exportProgress)
   const photoCount = useStudioStore((s) => s.draft.photos.length)
+  const pct = progress
+    ? Math.round((progress.current / Math.max(1, progress.total)) * 100)
+    : 0
 
   return (
-    <div className="export-bar">
-      <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap items-center gap-2">
-          {isReady ? (
-            <CheckCircle className="size-4 text-success-700" />
-          ) : (
-            <AlertCircle className="size-4 text-warning-700" />
-          )}
-          <strong className="text-sm text-fg-primary">
-            {isReady ? 'Ready to export' : 'Complete required fields to export'}
-          </strong>
-          <Badge color={isReady ? 'success' : 'warning'}>940 × 788</Badge>
-        </div>
-        <p className="mt-0.5 text-xs text-fg-tertiary">
-          {photoCount} photo{photoCount === 1 ? '' : 's'}
-          {progress
-            ? ` · ${progress.label} (${progress.current}/${progress.total})`
-            : ''}
-        </p>
-        {progress && (
-          <div
-            className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-border-secondary"
-            role="progressbar"
-            aria-valuenow={progress.current}
-            aria-valuemax={progress.total}
-          >
-            <div
-              className="h-full rounded-full bg-brand-500 transition-[width] duration-200"
-              style={{
-                width: `${(progress.current / Math.max(1, progress.total)) * 100}%`,
-              }}
-            />
+    <footer className="border-t border-border/80 bg-card/90 px-4 py-3 backdrop-blur-md">
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="min-w-0 flex-1 space-y-1.5">
+          <div className="flex flex-wrap items-center gap-2">
+            {isReady ? (
+              <CheckCircle2 className="size-4 text-emerald-500" />
+            ) : (
+              <AlertCircle className="size-4 text-amber-500" />
+            )}
+            <p className="text-sm font-medium">
+              {isReady ? 'Ready to export' : 'Complete required fields to export'}
+            </p>
+            <Badge variant="outline">940 × 788</Badge>
+            <span className="text-xs text-muted-foreground">
+              {photoCount} photo{photoCount === 1 ? '' : 's'}
+            </span>
           </div>
-        )}
+          {progress && (
+            <div className="max-w-md space-y-1">
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>{progress.label}</span>
+                <span>
+                  {progress.current}/{progress.total}
+                </span>
+              </div>
+              <Progress value={pct} className="h-1.5" />
+            </div>
+          )}
+        </div>
+
+        <Button variant="outline" onClick={() => setStep('review')}>
+          Review
+        </Button>
+        <Button onClick={() => setStep('export')}>
+          <Package data-icon="inline-start" />
+          Export package
+        </Button>
       </div>
-      <Button color="secondary" size="md" onPress={() => setStep('review')}>
-        Review
-      </Button>
-      <Button color="primary" size="md" onPress={() => setStep('export')}>
-        <Package data-icon className="size-4" />
-        Export package
-      </Button>
-    </div>
+    </footer>
   )
 }

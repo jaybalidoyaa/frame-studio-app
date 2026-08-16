@@ -30,6 +30,12 @@ import {
 import { ingestImageFile } from '../pipeline/ingest'
 import { providers } from '../providers'
 
+function applyTheme(theme: 'dark' | 'light') {
+  const root = document.documentElement
+  root.classList.toggle('dark', theme === 'dark')
+  root.setAttribute('data-theme', theme)
+}
+
 interface Toast {
   id: string
   message: string
@@ -157,7 +163,7 @@ export const useStudioStore = create<StudioState>((set, get) => ({
           getRecents('callsigns'),
           getRecents('locations'),
         ])
-      document.documentElement.setAttribute('data-theme', settings.theme)
+      applyTheme(settings.theme)
       let draft = drafts.find((d) => !d.archived) ?? createEmptyDraft()
       if (!drafts.length) {
         await saveDraft(draft)
@@ -202,7 +208,7 @@ export const useStudioStore = create<StudioState>((set, get) => ({
 
   setStep: (step) => set({ step }),
   setTheme: (theme) => {
-    document.documentElement.setAttribute('data-theme', theme)
+    applyTheme(theme)
     const settings = { ...get().settings, theme }
     set({ settings })
     void saveSettings(settings)

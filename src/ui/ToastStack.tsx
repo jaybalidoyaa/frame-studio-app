@@ -1,6 +1,8 @@
-import { XClose } from '@untitledui/icons'
-import { useStudioStore } from '../store/studioStore'
-import { Button } from '../components/base/buttons/button'
+import { X } from 'lucide-react'
+import { useStudioStore } from '@/store/studioStore'
+import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
+import { cn } from '@/lib/utils'
 
 export function ToastStack() {
   const toasts = useStudioStore((s) => s.toasts)
@@ -9,20 +11,29 @@ export function ToastStack() {
   return (
     <div className="toast-stack" aria-live="polite">
       {toasts.map((t) => (
-        <div key={t.id} className={`toast ${t.tone ?? 'info'}`} role="status">
+        <Card
+          key={t.id}
+          role="status"
+          className={cn(
+            'border-l-4 p-3 shadow-lg',
+            t.tone === 'error' && 'border-l-destructive',
+            t.tone === 'success' && 'border-l-emerald-500',
+            t.tone === 'warn' && 'border-l-amber-500',
+            (!t.tone || t.tone === 'info') && 'border-l-primary',
+          )}
+        >
           <div className="flex items-start justify-between gap-3">
-            <span>{t.message}</span>
+            <p className="text-sm leading-snug">{t.message}</p>
             <Button
-              color="tertiary"
-              size="sm"
+              variant="ghost"
+              size="icon-sm"
               aria-label="Dismiss"
-              className="!p-1"
-              onPress={() => dismissToast(t.id)}
+              onClick={() => dismissToast(t.id)}
             >
-              <XClose data-icon className="size-4" />
+              <X />
             </Button>
           </div>
-        </div>
+        </Card>
       ))}
     </div>
   )

@@ -138,22 +138,47 @@ export function PreviewCanvas() {
   }
 
   return (
-    <div className={fullscreen ? 'fixed inset-0 z-40 p-4' : ''} style={fullscreen ? { background: 'var(--bg)' } : undefined}>
+    <div
+      className={
+        fullscreen
+          ? 'fixed inset-0 z-40 bg-background p-4'
+          : undefined
+      }
+    >
       <div className="mb-3 flex flex-wrap items-center gap-2">
-        <h2 className="text-sm font-semibold tracking-wide">Live preview · 940×788</h2>
+        <h2 className="text-sm font-semibold tracking-tight">
+          Live preview
+          <span className="ml-2 font-normal text-muted-foreground">940×788</span>
+        </h2>
         <label className="chip cursor-pointer">
-          <input type="checkbox" checked={showSafe} onChange={(e) => setShowSafe(e.target.checked)} />
+          <input
+            type="checkbox"
+            checked={showSafe}
+            onChange={(e) => setShowSafe(e.target.checked)}
+          />
           Safe areas
         </label>
         <label className="chip cursor-pointer">
-          <input type="checkbox" checked={showGrid} onChange={(e) => setShowGrid(e.target.checked)} />
+          <input
+            type="checkbox"
+            checked={showGrid}
+            onChange={(e) => setShowGrid(e.target.checked)}
+          />
           Grid
         </label>
         <label className="chip cursor-pointer">
-          <input type="checkbox" checked={compare} onChange={(e) => setCompare(e.target.checked)} />
+          <input
+            type="checkbox"
+            checked={compare}
+            onChange={(e) => setCompare(e.target.checked)}
+          />
           Before
         </label>
-        <button type="button" className="btn btn-ghost" onClick={() => setFullscreen((v) => !v)}>
+        <button
+          type="button"
+          className="btn btn-ghost"
+          onClick={() => setFullscreen((v) => !v)}
+        >
           {fullscreen ? 'Exit full screen' : 'Full screen'}
         </button>
       </div>
@@ -173,10 +198,10 @@ export function PreviewCanvas() {
       {activePhoto && (
         <div className="mt-4 grid gap-3 md:grid-cols-2">
           <div>
-            <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>
+            <h3 className="mb-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
               Source inspector
             </h3>
-            <div className="overflow-auto border" style={{ borderColor: 'var(--border)', maxHeight: 220 }}>
+            <div className="max-h-[220px] overflow-auto rounded-lg border border-border">
               <img
                 src={activePhoto.sourceUrl}
                 alt="Source"

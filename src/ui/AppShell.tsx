@@ -1,18 +1,20 @@
-import { Menu01, XClose } from '@untitledui/icons'
-import { useStudioStore } from '../store/studioStore'
-import { WORKFLOW_LABELS, WORKFLOW_STEPS } from '../domain/types'
-import type { WorkflowStep } from '../domain/types'
-import { PhotosPanel } from '../features/photos/PhotosPanel'
-import { DetailsPanel } from '../features/details/DetailsPanel'
-import { TemplatePanel } from '../features/templates/TemplatePanel'
-import { EditPanel } from '../features/edit/EditPanel'
-import { ReviewPanel } from '../features/review/ReviewPanel'
-import { ExportPanel } from '../features/export/ExportPanel'
-import { PreviewCanvas } from './PreviewCanvas'
-import { DraftHeader } from './DraftHeader'
-import { ToastStack } from './ToastStack'
-import { ExportBar } from './ExportBar'
-import { Button } from '../components/base/buttons/button'
+import { Menu, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
+import { useStudioStore } from '@/store/studioStore'
+import { WORKFLOW_LABELS, WORKFLOW_STEPS } from '@/domain/types'
+import type { WorkflowStep } from '@/domain/types'
+import { PhotosPanel } from '@/features/photos/PhotosPanel'
+import { DetailsPanel } from '@/features/details/DetailsPanel'
+import { TemplatePanel } from '@/features/templates/TemplatePanel'
+import { EditPanel } from '@/features/edit/EditPanel'
+import { ReviewPanel } from '@/features/review/ReviewPanel'
+import { ExportPanel } from '@/features/export/ExportPanel'
+import { PreviewCanvas } from '@/ui/PreviewCanvas'
+import { DraftHeader } from '@/ui/DraftHeader'
+import { ToastStack } from '@/ui/ToastStack'
+import { ExportBar } from '@/ui/ExportBar'
+import { Button } from '@/components/ui/button'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { cn } from '@/lib/utils'
 
 function StepContent({ step }: { step: WorkflowStep }) {
   switch (step) {
@@ -36,50 +38,90 @@ export function AppShell() {
   const setStep = useStudioStore((s) => s.setStep)
   const inspectorOpen = useStudioStore((s) => s.inspectorOpen)
   const setInspectorOpen = useStudioStore((s) => s.setInspectorOpen)
+  const stepIndex = WORKFLOW_STEPS.indexOf(step)
 
   return (
     <div className="app-shell">
       <DraftHeader />
 
-      <nav className="stepper" aria-label="Workflow">
-        {WORKFLOW_STEPS.map((s, i) => (
-          <button
-            key={s}
-            type="button"
-            className="step"
-            aria-current={step === s ? 'step' : undefined}
-            onClick={() => setStep(s)}
+      <div className="border-b border-border/80 bg-card/60 backdrop-blur-sm">
+        <div className="flex items-center gap-2 px-3 py-2 sm:px-4">
+          <nav
+            className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto pb-0.5"
+            aria-label="Workflow"
           >
-            <span className="mr-1.5 inline-flex size-5 items-center justify-center rounded-full bg-black/15 text-[11px] font-bold">
-              {i + 1}
-            </span>
-            {WORKFLOW_LABELS[s]}
-          </button>
-        ))}
-        <div className="ml-auto flex items-center gap-2 md:hidden">
+            {WORKFLOW_STEPS.map((s, i) => {
+              const active = step === s
+              const done = i < stepIndex
+              return (
+                <button
+                  key={s}
+                  type="button"
+                  onClick={() => setStep(s)}
+                  aria-current={active ? 'step' : undefined}
+                  className={cn(
+                    'inline-flex shrink-0 items-center gap-2 rounded-lg px-2.5 py-2 text-sm font-medium transition-colors',
+                    active && 'bg-primary text-primary-foreground shadow-sm',
+                    !active &&
+                      done &&
+                      'text-foreground hover:bg-muted',
+                    !active &&
+                      !done &&
+                      'text-muted-foreground hover:bg-muted hover:text-foreground',
+                  )}
+                >
+                  <span
+                    className={cn(
+                      'inline-flex size-5 items-center justify-center rounded-full text-[11px] font-bold',
+                      active
+                        ? 'bg-primary-foreground/20 text-primary-foreground'
+                        : done
+                          ? 'bg-primary/20 text-primary'
+                          : 'bg-muted text-muted-foreground',
+                    )}
+                  >
+                    {i + 1}
+                  </span>
+                  <span className="hidden sm:inline">{WORKFLOW_LABELS[s]}</span>
+                </button>
+              )
+            })}
+          </nav>
+
           <Button
-            color="secondary"
+            variant="outline"
             size="sm"
-            onPress={() => setInspectorOpen(!inspectorOpen)}
+            className="shrink-0 md:hidden"
+            onClick={() => setInspectorOpen(!inspectorOpen)}
           >
-            {inspectorOpen ? (
-              <XClose data-icon className="size-4" />
-            ) : (
-              <Menu01 data-icon className="size-4" />
-            )}
-            {inspectorOpen ? 'Hide' : 'Panel'}
+            {inspectorOpen ? <PanelLeftClose /> : <PanelLeftOpen />}
+            <span className="hidden xs:inline">
+              {inspectorOpen ? 'Hide' : 'Tools'}
+            </span>
+            <Menu className="xs:hidden" />
           </Button>
         </div>
-      </nav>
+      </div>
 
       <div className="workspace">
         <aside
-          className={`panel inspector-pane p-3 sm:p-4 ${inspectorOpen ? 'open' : 'max-md:hidden'}`}
+          className={cn(
+            'min-h-0 border-r border-border/80 bg-sidebar text-sidebar-foreground',
+            !inspectorOpen && 'max-md:hidden',
+          )}
           aria-label="Inspector"
         >
-          <StepContent step={step} />
+          <ScrollArea className="h-full">
+            <div className="p-4">
+              <StepContent step={step} />
+            </div>
+          </ScrollArea>
         </aside>
-        <section className="preview-pane p-3 sm:p-4" aria-label="Preview">
+
+        <section
+          className="preview-pane min-h-0 overflow-auto bg-[var(--preview)] p-3 sm:p-4"
+          aria-label="Preview"
+        >
           <PreviewCanvas />
         </section>
       </div>
