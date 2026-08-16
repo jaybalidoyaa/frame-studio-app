@@ -177,13 +177,15 @@ describe('export dimensions and redaction bake', () => {
       }
     }
 
-    HTMLCanvasElement.prototype.getContext = function (this: HTMLCanvasElement) {
+    HTMLCanvasElement.prototype.getContext = function (
+      this: HTMLCanvasElement,
+    ) {
       const existing = (this as unknown as { __ctx?: MockCtx }).__ctx
       if (existing) return existing as unknown as CanvasRenderingContext2D
       const ctx = new MockCtx(this)
       ;(this as unknown as { __ctx?: MockCtx }).__ctx = ctx
       return ctx as unknown as CanvasRenderingContext2D
-    } as typeof HTMLCanvasElement.prototype.getContext
+    } as unknown as typeof HTMLCanvasElement.prototype.getContext
 
     HTMLCanvasElement.prototype.toBlob = function (
       cb: BlobCallback,
